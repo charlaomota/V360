@@ -11,7 +11,6 @@ import time
 import json
 from datetime import datetime
 from flask import Blueprint, request, jsonify, session
-from flask_socketio import SocketIO, emit, join_room, leave_room
 import threading
 from queue import Queue
 import uuid

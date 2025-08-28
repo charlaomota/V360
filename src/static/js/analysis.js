@@ -382,7 +382,7 @@ class ModernAnalysisSystem {
             this.updateProgress(0, 'Iniciando análise...');
 
             // Envia análise
-            const response = await fetch('/api/execute_complete_analysis', {
+            const response = await fetch('/api/analysis/execute_complete', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
@@ -1241,37 +1241,8 @@ async function pollProgress() {
 
 // --- Funções Globais Auxiliares ---
 
-// Inicialização global
-let analysisSystem;
-
-function executeAnalysis() {
-    console.log('🚀 Iniciando análise...');
-
-    const formData = getFormData();
-
-    if (!formData.segmento || !formData.produto) {
-        showAlert('Por favor, preencha pelo menos o segmento e produto.', 'warning');
-        return;
-    }
-
-    // Reset UI
-    document.getElementById('analysis-container').style.display = 'block';
-    document.getElementById('progress-container').style.display = 'block';
-    document.getElementById('results-container').style.display = 'none';
-
-    // Salva dados do formulário para continuação futura
-    const sessionData = {
-        ...formData,
-        startedAt: new Date().toISOString(),
-        status: 'initiated'
-    };
-
-    // Inicia análise
-    startAnalysis(formData);
-}
-
 function continueAnalysis(sessionId) {
-    console.log(`🔄 Continuando análise: ${sessionId}`);
+    console.log(`🔄Continuando análise: ${sessionId}`);
 
     const sessionData = persistence.getSession(sessionId);
     if (!sessionData) {
@@ -1346,7 +1317,7 @@ async function startAnalysis(formData) {
     try {
         isAnalysisRunning = true;
 
-        const response = await fetch('/api/execute_complete_analysis', {
+        const response = await fetch('/api/analysis/execute_complete', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
@@ -1356,7 +1327,7 @@ async function startAnalysis(formData) {
 
         const data = await response.json();
 
-        if (data.session_id) {
+        if (data.success && data.session_id) {
             currentAnalysisId = data.session_id;
 
             // Salva dados iniciais da sessão
@@ -1370,9 +1341,10 @@ async function startAnalysis(formData) {
             // Inicia auto-save
             startAutoSave();
 
+            showAlert('Análise iniciada com sucesso!', 'success');
             pollProgress();
         } else {
-            throw new Error('Session ID não retornado');
+            throw new Error(data.error || 'Erro ao iniciar análise');
         }
 
     } catch (error) {
@@ -1380,6 +1352,7 @@ async function startAnalysis(formData) {
         showAlert('Erro ao iniciar análise: ' + error.message, 'error');
         isAnalysisRunning = false;
         stopAutoSave();
+        showProgress(false);
     }
 }
 

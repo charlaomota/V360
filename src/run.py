@@ -86,11 +86,11 @@ def create_app():
     from routes.mcp import mcp_bp
     from routes.enhanced_workflow import enhanced_workflow_bp
 
-    app.register_blueprint(analysis_bp, url_prefix='/api')
+    app.register_blueprint(analysis_bp, url_prefix='/api/analysis')
     app.register_blueprint(enhanced_analysis_bp, url_prefix='/enhanced')
     app.register_blueprint(forensic_bp, url_prefix='/forensic')
     app.register_blueprint(files_bp, url_prefix='/files')
-    app.register_blueprint(progress_bp, url_prefix='/api')
+    app.register_blueprint(progress_bp, url_prefix='/api/progress')
     app.register_blueprint(user_bp, url_prefix='/user')
     app.register_blueprint(monitoring_bp, url_prefix='/monitoring')
     app.register_blueprint(pdf_bp, url_prefix='/pdf')
